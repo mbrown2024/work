@@ -3,7 +3,7 @@ import pandas as pd
 from datetime import datetime
 import io
 
-st.set_page_config(page_title="Stability Sample Generator", layout="centered")
+st.set_page_config(page_title="Stability Sample Generator", layout="wide")
 
 # Custom CSS for sans-serif font
 st.markdown("""
