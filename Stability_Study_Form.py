@@ -237,23 +237,110 @@ with tab1:
     dp_units = []
     dp_matrix = []
 
+    # --- Stylized Time Point Section using expanders so the entire bubble contains the widgets ---
+    st.markdown("""
+        <style>
+        /* Style the expander container to look like a bubble card */
+        .stExpander {
+            border-radius: 16px !important;
+            padding: 0 !important;
+            margin: 18px 0 !important;
+        }
+
+        /* The expander header (clickable row) */
+        .stExpander > .streamlit-expanderHeader {
+            background: linear-gradient(145deg,#ffffff,#f7f7fb);
+            border: 1px solid #e6e9ee;
+            border-radius: 12px;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        /* Make header text and numbered badge */
+        .timepoint-badge {
+            background-color: #1e40af;
+            color: white;
+            border-radius: 50%;
+            padding: 6px 10px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        /* The expander body (where widgets render) */
+        .stExpander > .streamlit-expanderContent {
+            background: linear-gradient(180deg, rgba(255,255,255,0.95), rgba(250,250,252,0.95));
+            border: 1px solid #eef2ff;
+            border-top: none;
+            border-radius: 0 0 12px 12px;
+            padding: 16px;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.03);
+            margin-top: -8px;
+        }
+
+        /* Slight hover lift for header */
+        .stExpander:hover > .streamlit-expanderHeader {
+            transform: translateY(-2px);
+            transition: transform .15s ease-in-out;
+        }
+        </style>
+    """, unsafe_allow_html=True)
+
     for i in range(num_dp_times):
-        col1, col2 = st.columns([1, 3])
-        with col1:
-            time_val = st.number_input(f"Time {i + 1}", key=f"dp_time_{i}", min_value=0.0, value=0.0, step=0.5)
-            time_unit = st.selectbox(f"Unit", options=VOCAB["time_units"], key=f"dp_unit_{i}")
-        with col2:
-            st.markdown(f"**Select temps for time point {i + 1}:**")
-            checks = st.columns(num_dp_temps)
+        # give a readable expander label but show the number badge visually using HTML inside the label
+        exp_label = f"🕒 Time Point {i + 1}"
+        with st.expander(exp_label, expanded=True):
+            # place a small HTML header with badge inside the expander header visually (the header styling above will affect it)
+            st.markdown(
+                f"""
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <div class="timepoint-badge">{i + 1}</div>
+                    <div style="font-weight:600; font-size:1rem;">Time Point {i + 1}</div>
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+
+            # Time and Unit side-by-side inside the bubble
+            c1, c2 = st.columns([1, 1])
+            with c1:
+                time_val = st.number_input(
+                    "Time",
+                    key=f"dp_time_{i}",
+                    min_value=0.0,
+                    value=0.0,
+                    step=0.5,
+                    label_visibility="visible"
+                )
+            with c2:
+                time_unit = st.selectbox(
+                    "Unit",
+                    options=VOCAB["time_units"],
+                    key=f"dp_unit_{i}",
+                    label_visibility="visible"
+                )
+
+            st.markdown("**Select Temps for this Time Point:**")
+
+            # Temperature checkboxes (kept in a single visual group)
+            # We'll arrange them in columns to match your num_dp_temps
+            check_cols = st.columns(num_dp_temps)
             matrix_row = []
-            for j, check_col in enumerate(checks):
-                with check_col:
-                    checked = st.checkbox(f"{dp_temps[j][:15]}", key=f"dp_matrix_{i}_{j}", value=False)
+            for j, chk in enumerate(check_cols):
+                with chk:
+                    # show temp label text; key ensures each checkbox is unique
+                    checked = st.checkbox(dp_temps[j] if j < len(dp_temps) else f"Temp {j + 1}",
+                                          key=f"dp_matrix_{i}_{j}",
+                                          value=False)
                     matrix_row.append(checked)
             dp_matrix.append(matrix_row)
 
-        dp_times.append(time_val)
-        dp_units.append(time_unit)
+            dp_times.append(time_val)
+            dp_units.append(time_unit)
+
+        st.markdown("</div>", unsafe_allow_html=True)
 
     if st.button("🧬 Generate DP Samples", type="primary"):
         if not all([exp_id, molecule, source, parent]):
@@ -324,23 +411,107 @@ with tab2:
     ds_units = []
     ds_matrix = []
 
+    # --- Stylized DS Time Point Section using expanders (bubble cards) ---
+    st.markdown("""
+        <style>
+        /* Reuse or define bubble styling for DS tab */
+        .stExpander {
+            border-radius: 16px !important;
+            padding: 0 !important;
+            margin: 18px 0 !important;
+        }
+
+        .stExpander > .streamlit-expanderHeader {
+            background: linear-gradient(145deg,#ffffff,#f7f7fb);
+            border: 1px solid #e6e9ee;
+            border-radius: 12px;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .timepoint-badge {
+            background-color: #047857; /* greenish color to differentiate DS tab */
+            color: white;
+            border-radius: 50%;
+            padding: 6px 10px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .stExpander > .streamlit-expanderContent {
+            background: linear-gradient(180deg, rgba(255,255,255,0.95), rgba(250,250,252,0.95));
+            border: 1px solid #eef2ff;
+            border-top: none;
+            border-radius: 0 0 12px 12px;
+            padding: 16px;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.03);
+            margin-top: -8px;
+        }
+
+        .stExpander:hover > .streamlit-expanderHeader {
+            transform: translateY(-2px);
+            transition: transform .15s ease-in-out;
+        }
+        </style>
+    """, unsafe_allow_html=True)
+
+    ds_times = []
+    ds_units = []
+    ds_matrix = []
+
     for i in range(num_ds_times):
-        col1, col2 = st.columns([1, 3])
-        with col1:
-            time_val = st.number_input(f"DS Time {i + 1}", key=f"ds_time_{i}", min_value=0.0, value=0.0, step=0.5)
-            time_unit = st.selectbox(f"DS Unit", options=VOCAB["time_units"], key=f"ds_unit_{i}")
-        with col2:
-            st.markdown(f"**Select DS temps for time point {i + 1}:**")
-            checks = st.columns(num_ds_temps)
+        exp_label = f"📦 DS Time Point {i + 1}"
+        with st.expander(exp_label, expanded=True):
+            st.markdown(
+                f"""
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <div class="timepoint-badge">{i + 1}</div>
+                    <div style="font-weight:600; font-size:1rem;">DS Time Point {i + 1}</div>
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+
+            # Time + Unit inside bubble
+            c1, c2 = st.columns([1, 1])
+            with c1:
+                time_val = st.number_input(
+                    "Time",
+                    key=f"ds_time_{i}",
+                    min_value=0.0,
+                    value=0.0,
+                    step=0.5,
+                    label_visibility="visible"
+                )
+            with c2:
+                time_unit = st.selectbox(
+                    "Unit",
+                    options=VOCAB["time_units"],
+                    key=f"ds_unit_{i}",
+                    label_visibility="visible"
+                )
+
+            st.markdown("**Select Temps for this Time Point:**")
+
+            check_cols = st.columns(num_ds_temps)
             matrix_row = []
-            for j, check_col in enumerate(checks):
-                with check_col:
-                    checked = st.checkbox(f"{ds_temps[j][:20]}", key=f"ds_matrix_{i}_{j}", value=False)
+            for j, chk in enumerate(check_cols):
+                with chk:
+                    checked = st.checkbox(
+                        ds_temps[j] if j < len(ds_temps) else f"Temp {j + 1}",
+                        key=f"ds_matrix_{i}_{j}",
+                        value=False
+                    )
                     matrix_row.append(checked)
             ds_matrix.append(matrix_row)
 
-        ds_times.append(time_val)
-        ds_units.append(time_unit)
+            ds_times.append(time_val)
+            ds_units.append(time_unit)
+
+        st.markdown("</div>", unsafe_allow_html=True)
 
     if st.button("🧬 Generate DS Samples", type="primary"):
         if not all([exp_id, molecule, source, parent]):
