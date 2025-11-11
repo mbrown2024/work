@@ -178,12 +178,12 @@ with tab1:
     st.subheader("Drug Product Stability Study")
 
     default_dp_forms = 1
-    default_dp_temps = 3
+    default_dp_temps = 5
     default_dp_times = 5
 
     # Formulations
     st.markdown("**Formulations**")
-    num_dp_forms = st.number_input("Number of DP Formulations", min_value=1, max_value=12, value=default_dp_forms,
+    num_dp_forms = st.number_input("Number of DP Formulations", min_value=1, max_value=20, value=default_dp_forms,
                                    key="num_dp_forms")
 
     dp_formulations = []
@@ -208,7 +208,7 @@ with tab1:
     num_dp_temps = st.number_input("Number of Temperature Conditions", min_value=1, max_value=8, value=default_dp_temps,
                                    key="num_dp_temps")
 
-    preset_temps = ["-20°C", "2-8°C", "25°C"]
+    preset_temps = ["-70°C","-20°C","2-8°C", "25°C", "40°C"]
 
     dp_temps = []
     dp_vials = []
@@ -230,7 +230,7 @@ with tab1:
 
     # Time Points
     st.markdown("**Time Points**")
-    num_dp_times = st.number_input("Number of Time Points", min_value=1, max_value=20, value=default_dp_times,
+    num_dp_times = st.number_input("Number of Time Points (excluding T0)", min_value=1, max_value=30, value=default_dp_times,
                                    key="num_dp_times")
 
     dp_times = []
